@@ -38,8 +38,8 @@ function GameplayLoop({route, navigation}) {
 
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Category" options={{headerShown: false}} component={ChooseCategory}/>
-      <Stack.Screen name="Game" options={{headerShown: false}} component={Game}/>
+      <Stack.Screen name="Category" options={{headerShown: false, presentation: "modal"}} component={ChooseCategory}/>
+      <Stack.Screen name="Game" options={{headerShown: false, animation: 'slide_from_bottom'}} component={Game}/>
     </Stack.Navigator>
   );
 }
@@ -50,7 +50,7 @@ const HomeScreen = ({navigation}) => {
 
     return (
       <Tabs.Navigator>
-          <Tabs.Screen name="Jugar" options={{headerShown: false, tabBarStyle: {display: hideTabBar ? 'none' : 'flex'}}} component={GameplayLoop}/>
+          <Tabs.Screen name="Jugar" options={{headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
           <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={Leaderboard} />
       </Tabs.Navigator>
     )

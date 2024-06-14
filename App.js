@@ -1,15 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform } from 'react-native';
+import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { enableScreens } from 'react-native-screens';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import TabBarStateProvider from './contexts/TabBarStateContext';
+
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   // Esta navegacion es solo para el flow de login, registro, y eventualmente la pantalla home
+  useEffect(() => {
+    if (Platform.OS === "ios") {
+      enableScreens(false);
+    }
+  }, []);
 
   return (
     <TabBarStateProvider>
@@ -20,6 +27,7 @@ const App = () => {
         </Stack.Navigator>
       </NavigationContainer>
     </TabBarStateProvider>
+
   );
 }
 
