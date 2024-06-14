@@ -1,11 +1,36 @@
+import { StyleSheet, Text, View, Platform, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { StyleSheet, Text, View } from 'react-native';
+const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    header: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+
+        width: '100%',
+        height: 50,
+        paddingLeft: 15
+    },
+});
+
 
 const Game = ({ navigation }) => {
+    const insets = useSafeAreaInsets();
+
+    const topPadding = Platform.OS === 'android' ? StatusBar.currentHeight : insets.top;
+
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red'}}>
-            <Text>Juego!!!!!!!!!!!</Text>
+    <View style={[styles.mainContainer, { paddingTop: topPadding }]}>
+        <View style={styles.header}>
+            <Text>X Ir atras</Text>
         </View>
+    </View>
     )
 }
 
