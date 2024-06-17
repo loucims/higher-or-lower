@@ -39,7 +39,7 @@ function GameplayLoop({route, navigation}) {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Category" options={{headerShown: false, presentation: "modal"}} component={ChooseCategory}/>
-      <Stack.Screen name="Game" options={{headerShown: false, animation: 'slide_from_bottom'}} component={Game}/>
+      <Stack.Screen name="Game" options={{headerShown: false, animation: 'slide_from_bottom', gestureEnabled: false}} component={Game}/>
     </Stack.Navigator>
   );
 }
