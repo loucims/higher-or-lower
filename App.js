@@ -6,16 +6,25 @@ import { enableScreens } from 'react-native-screens';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import TabBarStateProvider from './contexts/TabBarStateContext';
+import { useFonts } from 'expo-font';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  // Esta navegacion es solo para el flow de login, registro, y eventualmente la pantalla home
+
+  const [fontsLoaded, fontError] = useFonts({
+    'Inter': require('./assets/fonts/Inter-VariableFont.ttf'),
+  });
+
   useEffect(() => {
     if (Platform.OS === "ios") {
       enableScreens(false);
     }
   }, []);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
     <TabBarStateProvider>

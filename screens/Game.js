@@ -264,7 +264,7 @@ const Game = ({ navigation }) => {
                 setOptionHeight(height);
             }}
         >
-            <View style={{zIndex: '1', width: '100%'}}>
+            <View style={{zIndex: 1, width: '100%'}}>
                 <LinearGradient colors={['rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.8)']} style={styles.imageGradient}>
                     <Text style={styles.optionText}>{`"${options[0].title}"`}</Text>
                     <Text style={styles.optionTextSecondary}>tiene</Text>
@@ -274,7 +274,7 @@ const Game = ({ navigation }) => {
             </View>
 
 
-            <Image source={{uri: options[0].image}} resizeMode="cover" style={[styles.imageAbsolute, {borderTopEndRadius: 20, borderTopStartRadius: 20, zIndex: '0'}]} placeholder={options[0].blurhash}/>
+            <Image source={{uri: options[0].image}} resizeMode="cover" style={[styles.imageAbsolute, {borderTopEndRadius: 20, borderTopStartRadius: 20, zIndex: 0}]} placeholder={options[0].blurhash}/>
         </Animated.View>
 
         <View style={[styles.vsCircle, { backgroundColor: vsColor }]}>
@@ -282,7 +282,7 @@ const Game = ({ navigation }) => {
         </View>
 
         <Animated.View style={[styles.optionContainer, { transform: [{ translateY: bottomOptionAnim }], opacity: optionsOpacity  }]}>
-            <View style={{zIndex: '1', width: '100%'}}>
+            <View style={{zIndex: 1, width: '100%'}}>
                 <LinearGradient colors={['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.3)']} style={styles.imageGradient}>
                     
                     <Text style={[styles.optionText, {marginBottom: '25px'}]}>{`"${options[1].title}"`}</Text>
@@ -307,7 +307,7 @@ const Game = ({ navigation }) => {
                 </LinearGradient>
             </View>
 
-            <Image source={{uri: options[1].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: '0'}]} placeholder={options[1].blurhash}/>
+            <Image source={{uri: options[1].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: 0}]} placeholder={options[1].blurhash}/>
         </Animated.View>
         
     </View>
