@@ -61,7 +61,7 @@ const StartScreen = props => {
     setIsLoading(true);
     try {
       await dispatch(action);
-      props.navigation.navigate('HomeScreen');
+      props.navigation.navigate('Game');
     } catch (err) {
       setError(err.message);
       setIsLoading(false);
