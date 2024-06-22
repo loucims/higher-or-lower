@@ -1,6 +1,7 @@
 
 import { StyleSheet, Text, View } from 'react-native';
 import { useState } from 'react';
+import {API_URL} from "@env"
 
 const ChooseCategory = ({ navigation }) => {
 
@@ -20,8 +21,8 @@ const ChooseCategory = ({ navigation }) => {
                 pageSize: pageSize,
                 lastKey: lastKey
             });
-    
-            const response = await fetch(`http://10.0.2.2:8080/options/genre/${genre}/paginated?${params}`, fetchOptions);
+            
+            const response = await fetch(`${API_URL}/options/genre/${genre}/paginated?${params}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

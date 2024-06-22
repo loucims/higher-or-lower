@@ -3,6 +3,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState, useRef, useEffect } from 'react';
 import { Image } from 'expo-image';
+import {API_URL} from "@env"
+
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -102,16 +104,18 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         marginTop: 10
     
+    },
+    lostScreenContainer: {
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        backgroundColor: 'red',
+        borderTopEndRadius: 20,
+        borderTopStartRadius: 20,
     }
+
 });
 
-// const optionsData = [
-//     { id: 1, title: 'Joker', image: 'https://dl.dropboxusercontent.com/scl/fi/3fnxgyyb9er2a32welmgy/joker.png?rlkey=jbnpreb0jgg8nf4xfjv9ho9pe&st=whn9a3az&dl=0', value: 160432, blurhash: 'LMC$=es+00t8~oobDjogX5oen*WB'},
-//     { id: 2, title: '2012, el Apocalipsis', image: "https://dl.dropboxusercontent.com/scl/fi/960f9td46l40yleaoydc5/2012.png?rlkey=61zr78arzv7j7ycp4y5ucxd7w&st=nf7yhtv2&dl=0", value: 120000, blurhash: 'LDEyrd-pM{-:_4%MsRxt8^?a%1RP'},
-//     { id: 3, title: "Furiosa, a Mad Max Story", image: 'https://dl.dropboxusercontent.com/scl/fi/laormsflj60vylmv2v0oz/furiosa.png?rlkey=qipq9ivzp436uia2s4d8g92cz&st=ufvf176w&dl=0', value: 1330302, blurhash: 'LYHnA@S#%Kozy=ofTIt67gWqNdbb'},
-//     { id: 4, title: "Starwars", image: 'https://dl.dropboxusercontent.com/scl/fi/npwizc872dixrax7ad6k4/starwars.png?rlkey=v6zaycllvyi6lrtegp09f6tdj&st=7te7a8gt&dl=0', value: 22323, blurhash: 'LC9tiuIr4o=rKnWArpxY9u$y,kIv'},
-//     { id: 5, title: "Garfield", image: 'https://dl.dropboxusercontent.com/scl/fi/bsmkprtinmo741ak22gzj/garfield.png?rlkey=ib171dje8gzjhyxcza4acrjfh&st=81ir73sb&dl=0', value: 34334, blurhash: 'LAR]Jsvj_jj^-.knZ+RS@8OXNZ$M'},
-// ];
 
 
 const Game = ({ navigation, route }) => {
@@ -154,8 +158,7 @@ const Game = ({ navigation, route }) => {
                 lastKey: paginationLastKey
             });
     
-            console.log(`http://10.0.2.2:8080/options/genre/${genre}/paginated?${params}`);
-            const response = await fetch(`http://10.0.2.2:8080/options/genre/${genre}/paginated?${params}`, fetchOptions);
+            const response = await fetch(`${API_URL}/options/genre/${genre}/paginated?${params}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -372,6 +375,10 @@ const Game = ({ navigation, route }) => {
 
             <Image source={{uri: options[1].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: 0}]} placeholder={options[1].blurhash}/>
         </Animated.View>
+
+        {/* <View style={styles.lostScreenContainer}>
+
+        </View> */}
         
     </View>
     </>
