@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Platform, StatusBar, ImageBackground, Animated } from 'react-native';
+import { StyleSheet, Text, View, Platform, StatusBar, ImageBackground, Animated, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState, useRef, useEffect } from 'react';
@@ -109,10 +109,15 @@ const styles = StyleSheet.create({
         display: 'flex',
         height: '100%',
         width: '100%',
-        backgroundColor: 'red',
         borderTopEndRadius: 20,
         borderTopStartRadius: 20,
-    }
+    },
+    lostMainText: {
+        fontFamily: 'Inter',
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: 'white'
+    },
 
 });
 
@@ -132,6 +137,7 @@ const Game = ({ navigation, route }) => {
 
     const [highScore, setHighScore] = useState(0);
     const [score, setScore] = useState(0);
+    const [lost, setLost] = useState(false);
 
 
     const [searchCount, setSearchCount] = useState(0);
@@ -183,6 +189,32 @@ const Game = ({ navigation, route }) => {
         setLoading(false);
     };
 
+    const updateHighScore = async (newScore) => {
+        try {
+            const fetchOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userID: '1234',
+                    score: newScore,
+                }),
+            };
+    
+            const response = await fetch(`${API_URL}/highscore`, fetchOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+    
+            console.log(result.message);
+    
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
         // Prefetch next image when options change
         const prefetchNextImage = async () => {
@@ -198,30 +230,25 @@ const Game = ({ navigation, route }) => {
         prefetchNextImage();
     }, [options]);
 
-    useEffect(() => {
-        if (score > highScore) {
-            setHighScore(score);
-        }
-    }, [score])
-
 
     const countUpAnimation = (targetValue, callback) => {
+        // Los mejores valores de iOS son 100 y 10, los de Android son 10 y 10
         let count = 0;
         const interval = setInterval(() => {
             if (count < targetValue) {
-                count += Math.ceil(targetValue / 10);
+                count += Math.ceil(targetValue / 100);
                 setSearchCount(count);
             } else {
                 clearInterval(interval);
-                setSearchCount(targetValue); // Ensure it ends at the target value
+                setSearchCount(targetValue);
                 if (callback) {
                     callback();
                 }
             }
-        }, 1);
+        }, 10);
     };
 
-    const handlePress = (guess) => {
+    const handlePressHigherLower = (guess) => {
         let isCorrect
         if (guess === 'higher') {
             isCorrect = options[0].value <= options[1].value;
@@ -231,7 +258,7 @@ const Game = ({ navigation, route }) => {
         
         setShowResult(true)
 
-        const reloadOptionsAnimation = () => {
+        const reloadOptionsAnimation = (isCorrect) => {
             Animated.sequence([
                 Animated.parallel([
                     Animated.timing(topOptionAnim, {
@@ -271,16 +298,14 @@ const Game = ({ navigation, route }) => {
                         fetchQuestions(genre, limit, lastKey);
                     }
 
-                    // const nextOptions = [
-                    //     options[1],
-                    //     optionsData[(optionsData.indexOf(options[1]) + 1) % optionsData.length]
-                    // ];
-                    // setOptions(nextOptions);
-
                     // Reset anim
                     topOptionAnim.setValue(0);
                     bottomOptionAnim.setValue(0);
                     setShowResult(false);
+
+                    if (!isCorrect) {
+                        handleLoss();
+                    }
 
                     // Fade in for loading
                     Animated.timing(optionsOpacity, {
@@ -302,84 +327,122 @@ const Game = ({ navigation, route }) => {
             } else {
                 setVsMessage('FAIL');
                 setVsColor('red');
-                setScore(0);
             }
 
             // After one second, do the anim
-            setTimeout(reloadOptionsAnimation, 1000);
+            setTimeout(() => reloadOptionsAnimation(isCorrect), 1000);
         });
     };
+
+    const handleLoss = async  () => {
+        if (score > highScore) {
+            await updateHighScore(score);
+            setHighScore(score)
+        }
+        setLost(true)
+    }
+
+    const handlePlayAgain = () => {
+        setScore(0);
+        setLost(false);
+    }
 
     return (
     <>
     {topPadding > 0 && <View style={{width: '100%', height: topPadding, backgroundColor: 'black'}}/>}
     <View style={styles.mainContainer}>
-        <View style={styles.header}>
-            <View onTouchEnd={() => {navigation.navigate('Category')}}>
-                <Text style={styles.textSecondary}>X  Ir atras</Text>
-            </View>
-            <View style={{flexDirection: 'row', paddingRight: 5, paddingTop: 2, gap: 15}}>
-                <Text style={styles.textSecondary}>High score: {highScore}</Text>
-                <Text style={styles.textSecondary}>Score: {score}</Text>
-            </View>
-        </View>
-
-        <Animated.View style={[styles.optionContainer, { transform: [{ translateY: topOptionAnim }], opacity: optionsOpacity }]}
-            onLayout={(event) => {
-                const { height } = event.nativeEvent.layout;
-                setOptionHeight(height);
-            }}
-        >
-            <View style={{zIndex: 1, width: '100%'}}>
-                <LinearGradient colors={['rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.8)']} style={styles.imageGradient}>
-                    <Text style={styles.optionText}>{`"${options[0].title}"`}</Text>
-                    <Text style={styles.optionTextSecondary}>tiene</Text>
-                    <Text style={styles.optionValue}>{options[0].value.toLocaleString()}</Text>
-                    <Text style={styles.optionTextSecondary}>visitas promedio por mes</Text>
-                </LinearGradient>
+        {!lost ?
+            <>
+            <View style={styles.header}>
+                <View onTouchEnd={() => {navigation.navigate('Category')}}>
+                    <Text style={styles.textSecondary}>X  Ir atras</Text>
+                </View>
+                <View style={{flexDirection: 'row', paddingRight: 5, paddingTop: 2, gap: 15}}>
+                    <Text style={styles.textSecondary}>High score: {highScore}</Text>
+                    <Text style={styles.textSecondary}>Score: {score}</Text>
+                </View>
             </View>
 
-
-            <Image source={{uri: options[0].image}} resizeMode="cover" style={[styles.imageAbsolute, {borderTopEndRadius: 20, borderTopStartRadius: 20, zIndex: 0}]} placeholder={options[0].blurhash}/>
-        </Animated.View>
-
-        <View style={[styles.vsCircle, { backgroundColor: vsColor }]}>
-            <Text style={styles.textSecondary}>{vsMessage}</Text>
-        </View>
-
-        <Animated.View style={[styles.optionContainer, { transform: [{ translateY: bottomOptionAnim }], opacity: optionsOpacity  }]}>
-            <View style={{zIndex: 1, width: '100%'}}>
-                <LinearGradient colors={['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.3)']} style={styles.imageGradient}>
-                    
-                    <Text style={[styles.optionText, {marginBottom: '25px'}]}>{`"${options[1].title}"`}</Text>
-                    <Text style={styles.optionTextSecondary}>tiene</Text>
-                    {showResult ? 
-                    <>
-                        <Text style={styles.optionValue}>{searchCount.toLocaleString()}</Text>
+            <Animated.View style={[styles.optionContainer, { transform: [{ translateY: topOptionAnim }], opacity: optionsOpacity }]}
+                onLayout={(event) => {
+                    const { height } = event.nativeEvent.layout;
+                    setOptionHeight(height);
+                }}
+            >
+                <View style={{zIndex: 1, width: '100%'}}>
+                    <LinearGradient colors={['rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.8)']} style={styles.imageGradient}>
+                        <Text style={styles.optionText}>{`"${options[0].title}"`}</Text>
+                        <Text style={styles.optionTextSecondary}>tiene</Text>
+                        <Text style={styles.optionValue}>{options[0].value.toLocaleString()}</Text>
                         <Text style={styles.optionTextSecondary}>visitas promedio por mes</Text>
-                    </>
-                    : 
-                    <>
-                        <View onTouchStart={() => handlePress("higher")} style={styles.button}>
-                            <Text>MAS ^</Text>
-                        </View>
-                        <Text style={styles.optionTextSecondary}>o</Text>
-                        <View onTouchStart={() => handlePress("lower")} style={styles.button}>
-                            <Text>MENOS v</Text>
-                        </View>
-                    </>
-                    }
+                    </LinearGradient>
+                </View>
 
-                </LinearGradient>
+
+                <Image source={{uri: options[0].image}} resizeMode="cover" style={[styles.imageAbsolute, {borderTopEndRadius: 20, borderTopStartRadius: 20, zIndex: 0}]} placeholder={options[0].blurhash}/>
+            </Animated.View>
+
+            <View style={[styles.vsCircle, { backgroundColor: vsColor }]}>
+                <Text style={styles.textSecondary}>{vsMessage}</Text>
             </View>
 
-            <Image source={{uri: options[1].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: 0}]} placeholder={options[1].blurhash}/>
-        </Animated.View>
+            <Animated.View style={[styles.optionContainer, { transform: [{ translateY: bottomOptionAnim }], opacity: optionsOpacity  }]}>
+                <View style={{zIndex: 1, width: '100%'}}>
+                    <LinearGradient colors={['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.3)']} style={styles.imageGradient}>
+                        
+                        <Text style={[styles.optionText, {marginBottom: '25px'}]}>{`"${options[1].title}"`}</Text>
+                        <Text style={styles.optionTextSecondary}>tiene</Text>
+                        {showResult ? 
+                        <>
+                            <Text style={styles.optionValue}>{searchCount.toLocaleString()}</Text>
+                            <Text style={styles.optionTextSecondary}>visitas promedio por mes</Text>
+                        </>
+                        : 
+                        <>
+                            <View onTouchStart={() => handlePressHigherLower("higher")} style={styles.button}>
+                                <Text>MAS ^</Text>
+                            </View>
+                            <Text style={styles.optionTextSecondary}>o</Text>
+                            <View onTouchStart={() => handlePressHigherLower("lower")} style={styles.button}>
+                                <Text>MENOS v</Text>
+                            </View>
+                        </>
+                        }
 
-        {/* <View style={styles.lostScreenContainer}>
+                    </LinearGradient>
+                </View>
 
-        </View> */}
-        
+                <Image source={{uri: options[1].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: 0}]} placeholder={options[1].blurhash}/>
+            </Animated.View>
+            
+            </>
+            :
+            <>
+            <View style={styles.header}>
+                <View onTouchEnd={() => {navigation.navigate('Category')}}>
+                    <Text style={styles.textSecondary}>X  Ir atras</Text>
+                </View>
+            </View>
+
+            <View style={styles.lostScreenContainer}>
+                <LinearGradient colors={['rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.5)', 'rgba(0, 0, 0, 0.8)']} style={[styles.imageGradient, {gap: 20, zIndex: 1}]}>
+                        <Text style={styles.lostMainText}>Has perdido!</Text>
+                        <Text style={styles.optionTextSecondary}>Score: {score}</Text>
+                        <Text style={styles.optionTextSecondary}>High score: {highScore}</Text>
+                        <View style={{display: 'flex', flexDirection: 'row', gap: 20}}>
+                            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Category')}>
+                                <Text>Volver</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.button} onPress={handlePlayAgain}>
+                                <Text>Jugar devuelta</Text>
+                            </TouchableOpacity>
+
+                        </View>
+                </LinearGradient>
+                <Image source={{uri: options[0].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: 0}]} placeholder={options[0].blurhash}/>
+            </View>
+            </>
+        }
     </View>
     </>
 

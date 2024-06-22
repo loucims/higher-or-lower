@@ -29,7 +29,6 @@ const ChooseCategory = ({ navigation }) => {
             const result = await response.json();
             console.log(result)
             return result.message
-            // setOptionFeed(prev => [...prev, result.message.data]);
         } catch (error) {
             console.log(error);
         }
