@@ -1,14 +1,85 @@
-import { AsyncStorage } from 'react-native';
+// store/actions/auth.js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = 'https://keen-man-hot.ngrok-free.app'; // Replace with the actual URL of your backend
+
+export const signup = createAsyncThunk('auth/signup', async ({ email, password }, thunkAPI) => {
+    const response = await fetch(`${API_URL}/signup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    });
+
+    if (!response.ok) {
+        const errorResData = await response.json();
+        let message = 'Something went wrong!';
+        if (errorResData.error.message === 'EMAIL_EXISTS') {
+            message = 'This email exists already!';
+        }
+        throw new Error(message);
+    }
+
+    const resData = await response.json();
+    await AsyncStorage.setItem(
+        'userData',
+        JSON.stringify({
+            token: resData.token,
+            userId: resData.userId
+        })
+    );
+
+    return resData;
+});
+
+export const login = createAsyncThunk('auth/login', async ({ email, password }, thunkAPI) => {
+    const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    });
+
+    if (!response.ok) {
+        const errorResData = await response.json();
+        let message = 'Something went wrong!';
+        if (errorResData.error.message === 'EMAIL_NOT_FOUND') {
+            message = 'This email could not be found!';
+        } else if (errorResData.error.message === 'INVALID_PASSWORD') {
+            message = 'This password is not valid!';
+        }
+        throw new Error(message);
+    }
+
+    const resData = await response.json();
+    await AsyncStorage.setItem(
+        'userData',
+        JSON.stringify({
+            token: resData.token,
+            userId: resData.userId
+        })
+    );
+
+    return resData;
+});
+
+
+
+
+//import { AsyncStorage } from 'react-native';
 
 // export const SIGNUP = 'SIGNUP';
 // export const LOGIN = 'LOGIN';
-export const AUTHENTICATE = 'AUTHENTICATE';
-export const LOGOUT = 'LOGOUT';
-export const SET_DID_TRY_AL = 'SET_DID_TRY_AL';
+//export const AUTHENTICATE = 'AUTHENTICATE';
+//export const LOGOUT = 'LOGOUT';
+//export const SET_DID_TRY_AL = 'SET_DID_TRY_AL';
 
-let timer;
+//let timer;
 
-export const setDidTryAL = () => {
+/*export const setDidTryAL = () => {
   return { type: SET_DID_TRY_AL };
 };
 
@@ -22,7 +93,7 @@ export const authenticate = (userId, token, expiryTime) => {
 export const signup = (email, password) => {
   return async dispatch => {
     const response = await fetch(
-      '',
+      'https://keen-man-hot.ngrok-free.app',
       {
         method: 'POST',
         headers: {
@@ -137,4 +208,4 @@ const saveDataToStorage = (token, userId, expirationDate) => {
       expiryDate: expirationDate.toISOString()
     })
   );
-};
+};*/
