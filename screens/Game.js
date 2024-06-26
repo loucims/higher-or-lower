@@ -129,13 +129,14 @@ const Game = ({ navigation, route }) => {
     const [optionHeight, setOptionHeight] = useState(0);
 
     const [loading, setLoading] = useState(false)
-    const { genre, limit, startAfterKey, initData } = route.params;
+    const { genre, limit, startAfterKey, initData, initHighscore } = route.params;
 
     const [lastKey, setLastKey] = useState(startAfterKey);
     const [optionFeed, setOptionFeed] = useState(initData || []);
     const [options, setOptions] = useState([optionFeed[0], optionFeed[1]]);
 
-    const [highScore, setHighScore] = useState(0);
+    const [highScore, setHighScore] = useState(initHighscore || 0);
+    const [totalGuesses, setTotalGuesses] = useState(0);
     const [score, setScore] = useState(0);
     const [lost, setLost] = useState(false);
 
@@ -156,6 +157,7 @@ const Game = ({ navigation, route }) => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
                 },
             };
     
@@ -192,17 +194,43 @@ const Game = ({ navigation, route }) => {
     const updateHighScore = async (newScore) => {
         try {
             const fetchOptions = {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
                 },
                 body: JSON.stringify({
-                    userID: '1234',
-                    score: newScore,
+                    value: newScore
                 }),
             };
     
-            const response = await fetch(`${API_URL}/highscore`, fetchOptions);
+            const response = await fetch(`${API_URL}/stat/updateNormalRecord/${3}`, fetchOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+    
+            console.log(result.message);
+    
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const addTotalGuesses = async (totalGuessesInRound) => {
+        try {
+            const fetchOptions = {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
+                },
+                body: JSON.stringify({
+                    value: totalGuessesInRound
+                }),
+            };
+    
+            const response = await fetch(`${API_URL}/stat/updateTotalGuesses/${3}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -249,6 +277,7 @@ const Game = ({ navigation, route }) => {
     };
 
     const handlePressHigherLower = (guess) => {
+        setTotalGuesses(totalGuesses + 1);
         let isCorrect
         if (guess === 'higher') {
             isCorrect = options[0].value <= options[1].value;
@@ -337,12 +366,14 @@ const Game = ({ navigation, route }) => {
     const handleLoss = async  () => {
         if (score > highScore) {
             await updateHighScore(score);
+            await addTotalGuesses(totalGuesses);
             setHighScore(score)
         }
         setLost(true)
     }
 
     const handlePlayAgain = () => {
+        setTotalGuesses(0);
         setScore(0);
         setLost(false);
     }

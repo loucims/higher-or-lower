@@ -14,6 +14,7 @@ const ChooseCategory = ({ navigation }) => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
                 },
             };
     
@@ -27,7 +28,7 @@ const ChooseCategory = ({ navigation }) => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
-            console.log(result)
+            console.log(result.message.data)
             return result.message
         } catch (error) {
             console.log(error);
@@ -35,14 +36,40 @@ const ChooseCategory = ({ navigation }) => {
         setLoading(false)
     }
 
+    const fetchHighscore = async () => {
+        try {
+            const fetchOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
+                },
+            };
+    
+            const response = await fetch(`${API_URL}/user/profile`, fetchOptions);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+    
+            return result.message.stat.recordNormal;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
     const handleGenrePress = async (genre) => {
+        const highscore = await fetchHighscore()
+        console.log(highscore)
         const result = await fetchQuestions(genre, 5, '')
         if (!result) return console.log('Error fetching data')
         navigation.navigate('Game', {
             genre: genre,
             limit: 10,
             startAfterKey: result.lastKey,
-            initData: result.data
+            initData: result.data,
+            initHighscore: highscore
         })
     }
 
