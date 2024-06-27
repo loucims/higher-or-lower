@@ -1,12 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-
-const API_URL = Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080';// Replace with the actual URL of your backend
+import {API_URL} from '@env'
 
 export const signup = createAsyncThunk('auth/signup', async ({ email, password }, thunkAPI) => {
     try {
-        const response = await fetch(`${API_URL}/signup`, {
+        const response = await fetch(`${API_URL}/user/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -42,13 +41,18 @@ export const signup = createAsyncThunk('auth/signup', async ({ email, password }
 
 export const login = createAsyncThunk('auth/login', async ({ email, password }, thunkAPI) => {
     try {
-        const response = await fetch(`${API_URL}/login`, {
+        const response = await fetch(`${API_URL}/user/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Cookie': "token=ey28232w7u32u7hdsuhsdhuh2h7272273"
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify(
+              {
+                "mail": email,
+                "password": password
+              }
+            ),
             
         });
 

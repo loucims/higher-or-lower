@@ -115,7 +115,7 @@ const LoginScreen = props => {
             console.log('Login/Signup successful', resultAction);
             if (resultAction) {
                 console.log('Navigating to LoadingScreen');
-                props.navigation.navigate('LoadingScreen');
+                props.navigation.navigate('Home');
             }
         } catch (err) {
             console.error('Error during login/signup', err);
