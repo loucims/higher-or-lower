@@ -50,8 +50,7 @@ export const login = createAsyncThunk('auth/login', async ({ email, password }, 
         const response = await fetch(`${API_URL}/user/login`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Cookie': "token=ey28232w7u32u7hdsuhsdhuh2h7272273"
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(
               {

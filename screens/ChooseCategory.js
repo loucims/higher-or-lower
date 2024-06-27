@@ -1,11 +1,12 @@
-
 import { StyleSheet, Text, View } from 'react-native';
 import { useState } from 'react';
 import {API_URL} from "@env"
+import { useSelector } from 'react-redux';
+import { selectAuthToken } from '../store/selectors/auth';
 
 const ChooseCategory = ({ navigation }) => {
-
     const [loading, setLoading] = useState(false)
+    const token = useSelector(selectAuthToken)
 
     const fetchQuestions = async (genre = 'movie', pageSize = 5, lastKey = '') => {
         setLoading(true)
@@ -14,7 +15,7 @@ const ChooseCategory = ({ navigation }) => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
+                    'Authorization': `${token}`,
                 },
             };
     
@@ -36,13 +37,13 @@ const ChooseCategory = ({ navigation }) => {
         setLoading(false)
     }
 
-    const fetchHighscore = async () => {
+    const fetchProfile = async () => {
         try {
             const fetchOptions = {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
+                    'Authorization': `${token}`,
                 },
             };
     
@@ -51,8 +52,8 @@ const ChooseCategory = ({ navigation }) => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
-    
-            return result.message.stat.recordNormal;
+            console.log(result)
+            return result.message;
         } catch (error) {
             console.log(error);
         }
@@ -60,7 +61,11 @@ const ChooseCategory = ({ navigation }) => {
 
 
     const handleGenrePress = async (genre) => {
-        const highscore = await fetchHighscore()
+        if (!token) throw new Error('No token found')
+        console.log(token)
+        const profile = await fetchProfile()
+        const highscore = profile.stat.recordNormal
+        const userID = profile.id
         console.log(highscore)
         const result = await fetchQuestions(genre, 5, '')
         if (!result) return console.log('Error fetching data')
@@ -69,7 +74,8 @@ const ChooseCategory = ({ navigation }) => {
             limit: 10,
             startAfterKey: result.lastKey,
             initData: result.data,
-            initHighscore: highscore
+            initHighscore: highscore,
+            userID: userID
         })
     }
 

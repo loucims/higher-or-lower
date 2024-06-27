@@ -4,6 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState, useRef, useEffect } from 'react';
 import { Image } from 'expo-image';
 import {API_URL} from "@env"
+import { useSelector } from 'react-redux';
+import { selectAuthToken } from '../store/selectors/auth';
 
 
 const styles = StyleSheet.create({
@@ -118,22 +120,34 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white'
     },
+    timer: {
+        position: 'absolute',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        bottom: 15,
+        right: 15,
+        zIndex: 1,
+    }
 
 });
 
 
 
 const Game = ({ navigation, route }) => {
+    const token = useSelector(selectAuthToken)
+
     const insets = useSafeAreaInsets();
     const topPadding = Platform.OS === 'android' ? StatusBar.currentHeight : insets.top;
     const [optionHeight, setOptionHeight] = useState(0);
 
     const [loading, setLoading] = useState(false)
-    const { genre, limit, startAfterKey, initData, initHighscore } = route.params;
+    const { genre, limit, startAfterKey, initData, initHighscore, userID } = route.params;
+    const [firstOption, secondOption, ...restOptions] = initData || [];
 
     const [lastKey, setLastKey] = useState(startAfterKey);
-    const [optionFeed, setOptionFeed] = useState(initData || []);
-    const [options, setOptions] = useState([optionFeed[0], optionFeed[1]]);
+    const [optionFeed, setOptionFeed] = useState(restOptions);
+    const [options, setOptions] = useState([firstOption, secondOption]);
 
     const [highScore, setHighScore] = useState(initHighscore || 0);
     const [totalGuesses, setTotalGuesses] = useState(0);
@@ -150,6 +164,35 @@ const Game = ({ navigation, route }) => {
     const bottomOptionAnim = useRef(new Animated.Value(0)).current;
     const optionsOpacity = useRef(new Animated.Value(1)).current;
 
+    const [time, setTime] = useState(150); // 2:30 in seconds (2 * 60 + 30)
+    const [isActive, setIsActive] = useState(true);
+  
+    useEffect(() => {
+      let interval = null;
+      if (isActive && time > 0) {
+        interval = setInterval(() => {
+          setTime((time) => time - 1);
+        }, 1000);
+      } else if (time === 0) {
+        clearInterval(interval);
+        onTimerEnd();
+      }
+      return () => clearInterval(interval);
+    }, [isActive, time]);
+  
+    const onTimerEnd = () => {
+      console.log('Timer ended!');
+      // Do something when the timer ends
+    };
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+    };
+    
+
+
     const fetchQuestions = async (genre = 'movie', pageSize = 10, paginationLastKey = '') => {
         setLoading(true);
         try {
@@ -157,7 +200,7 @@ const Game = ({ navigation, route }) => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
+                    'Authorization': `${token}`,
                 },
             };
     
@@ -197,14 +240,14 @@ const Game = ({ navigation, route }) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
+                    'Authorization': `${token}`,
                 },
                 body: JSON.stringify({
                     value: newScore
                 }),
             };
     
-            const response = await fetch(`${API_URL}/stat/updateNormalRecord/${3}`, fetchOptions);
+            const response = await fetch(`${API_URL}/stat/updateNormalRecord/${userID}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -223,14 +266,14 @@ const Game = ({ navigation, route }) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Cookie': `token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7ImlkIjozLCJuYW1lIjoiSnVhbmNpdG8zIn0sImlhdCI6MTcxOTI3MDY1OCwiZXhwIjoxNzE5MzU3MDU4fQ._yv1iCys3O7BL-qr-WPO-KxVdTmiVTaX7fHSzlqU3EA`,
+                    'Authorization': `${token}`,
                 },
                 body: JSON.stringify({
                     value: totalGuessesInRound
                 }),
             };
     
-            const response = await fetch(`${API_URL}/stat/updateTotalGuesses/${3}`, fetchOptions);
+            const response = await fetch(`${API_URL}/stat/updateTotalGuesses/${userID}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -310,6 +353,10 @@ const Game = ({ navigation, route }) => {
                     useNativeDriver: true,
                 }).start(async () => {
 
+                    if (!isCorrect) {
+                        handleLoss();
+                    }
+
                     const [nextOption, ...remainingOptions] = optionFeed;
 
                     // Update options
@@ -332,9 +379,6 @@ const Game = ({ navigation, route }) => {
                     bottomOptionAnim.setValue(0);
                     setShowResult(false);
 
-                    if (!isCorrect) {
-                        handleLoss();
-                    }
 
                     // Fade in for loading
                     Animated.timing(optionsOpacity, {
@@ -445,9 +489,16 @@ const Game = ({ navigation, route }) => {
 
                 <Image source={{uri: options[1].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: 0}]} placeholder={options[1].blurhash}/>
             </Animated.View>
+
+            <View style={styles.timer}>
+                <Text>{formatTime(time)}</Text>
+            </View>
             
             </>
             :
+
+
+
             <>
             <View style={styles.header}>
                 <View onTouchEnd={() => {navigation.navigate('Category')}}>
