@@ -6,14 +6,15 @@ import {
     StyleSheet,
     Button,
     ActivityIndicator,
-    Alert
+    Alert,
+    Image
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useDispatch } from 'react-redux';
 
 import Input from '../components/Input';
 import Card from '../components/Card';
-import { signup, login } from '../store/actions/auth'; 
+import { signup, login } from '../store/actions/auth';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -79,10 +80,10 @@ const LoginScreen = props => {
             password: false
         },
         formIsValid: false
-        
+
     });
-    
-    
+
+
 
     useEffect(() => {
         if (error) {
@@ -95,7 +96,7 @@ const LoginScreen = props => {
             Alert.alert('Invalid input!', 'Please enter a valid email and password.', [{ text: 'Okay' }]);
             return;
         }
-    
+
         let action;
         if (isSignup) {
             action = signup({
@@ -149,7 +150,7 @@ const LoginScreen = props => {
             setIsLoading(false);
         }
     };*/
-  
+
 
     const inputChangeHandler = useCallback(
         (inputIdentifier, inputValue, inputValidity) => {
@@ -162,7 +163,7 @@ const LoginScreen = props => {
         },
         [dispatchFormState]
     );
-   
+
 
     return (
         <KeyboardAvoidingView
@@ -170,7 +171,10 @@ const LoginScreen = props => {
             keyboardVerticalOffset={50}
             style={styles.screen}
         >
-            <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
+            <LinearGradient colors={['#ffffff', '#ffffff']} style={styles.gradient}>
+                <View style={styles.logoContainer}>
+                    <Image source={require('../assets/logo.png')} style={styles.logo} />
+                </View>
                 <Card style={styles.authContainer}>
                     <ScrollView>
                         <Input
@@ -198,7 +202,7 @@ const LoginScreen = props => {
                         />
                         <View style={styles.buttonContainer}>
                             {isLoading ? (
-                                <ActivityIndicator size="small"/>
+                                <ActivityIndicator size="small" />
                             ) : (
                                 <Button
                                     title={isSignup ? 'Sign Up' : 'Login'}
@@ -223,7 +227,6 @@ const LoginScreen = props => {
 console.log('COMO TERMINO', LoginScreen);
 
 
-
 const styles = StyleSheet.create({
     screen: {
         flex: 1
@@ -232,6 +235,14 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    logoContainer: {
+        marginBottom: 20,
+        alignItems: 'center'
+    },
+    logo: {
+        width: 300,
+        height: 300
     },
     authContainer: {
         width: '80%',
