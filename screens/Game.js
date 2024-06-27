@@ -256,8 +256,11 @@ const Game = ({ navigation, route }) => {
                     value: newScore
                 }),
             };
-    
-            const response = await fetch(`${API_URL}/stat/updateNormalRecord/${userID}`, fetchOptions);
+            let path = `${API_URL}/stat/updateNormalRecord/${userID}`
+            if (isTimed) {
+                path = `${API_URL}/stat/updateTimedRecord/${userID}`
+            }
+            const response = await fetch(path, fetchOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

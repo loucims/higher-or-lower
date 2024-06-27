@@ -74,7 +74,8 @@ const ChooseCategory = ({ navigation }) => {
 
         
         const profile = await fetchProfile()
-        const highscore = profile.stat.recordNormal
+        let highscore = profile.stat.recordNormal
+        if (isTimedMode) highscore = profile.stat.recordTimer
         const userID = profile.id
 
         const result = await fetchQuestions(genre, 5, '')

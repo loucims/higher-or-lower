@@ -28,19 +28,22 @@ const LeaderboardScreen = () => {
           <Text style={[styles.toggleButtonText, currentLeaderboard === 'timer' && styles.activeToggleButtonText]}>Leaderboard Timer</Text>
         </TouchableOpacity>
       </View>
-      {currentLeaderboard === 'normal' ? (
+      {currentLeaderboard === 'normal' ? 
         <Leaderboard
+          key="normal"
           apiEndpoint={`${API_URL}/user/leaderboard`}
           title="Ranking Modo Normal"
           recordType="recordNormal"
         />
-      ) : (
+      : 
         <Leaderboard
-          apiEndpoint={`${API_URL}/user/leaderboard`}
+          key='timer'
+          apiEndpoint={`${API_URL}/user/leaderboardTimer`}
           title="Ranking Modo Timer"
           recordType="recordTimer"
+          rankingType='timer'
         />
-      )}
+      }
     </View>
     </>
   );

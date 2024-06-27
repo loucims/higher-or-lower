@@ -5,13 +5,12 @@ import { useSelector } from 'react-redux';
 import { selectAuthToken } from '../store/selectors/auth';
 import { ActivityIndicator } from 'react-native';
 
-const Leaderboard = ({ apiEndpoint, title }) => {
+const Leaderboard = ({ apiEndpoint, title, rankingType = 'normal' }) => {
   const token = useSelector(selectAuthToken);
 
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [rankingType, setRankingType] = useState('normal');
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -66,7 +65,7 @@ const Leaderboard = ({ apiEndpoint, title }) => {
           >
             <Text style={styles.rank}>TOP{index + 1}</Text>
             <Text style={styles.userName}>{user.userName}</Text>
-            <Text style={styles.record}>{user.stat[rankingType]}</Text>
+            <Text style={styles.record}>{rankingType == 'normal' ? user.stat.recordNormal : user.stat.recordTimer}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
