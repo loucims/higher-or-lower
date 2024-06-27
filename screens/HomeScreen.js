@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
-
+import MyProfileScreen from './MyProfileScreen';
+import LeaderBoardScreen from './LeaderBoardScreen';
 import ChooseCategory from './ChooseCategory';
 import Game from './Game';
 
@@ -13,14 +14,6 @@ const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator()
 
 
-
-function Leaderboard() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Leaderboard</Text>
-    </View>
-  );
-}
 
 function GameplayLoop({route, navigation}) {
   const {setHideTabBar} = useTabBarState()
@@ -51,7 +44,8 @@ const HomeScreen = ({navigation}) => {
     return (
       <Tabs.Navigator>
           <Tabs.Screen name="Jugar" options={{headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
-          <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={Leaderboard} />
+          <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderBoardScreen} />
+          <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} />
       </Tabs.Navigator>
     )
 }
