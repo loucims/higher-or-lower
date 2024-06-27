@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { selectAuthToken } from '../store/selectors/auth';
+import { ActivityIndicator } from 'react-native';
 
-const Leaderboard = ({ apiEndpoint, title, recordType }) => {
+const Leaderboard = ({ apiEndpoint, title }) => {
+  const token = useSelector(selectAuthToken);
+
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [rankingType, setRankingType] = useState('normal');
   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
+      setLoading(true)
       try {
-
         const fetchOptions = {
           method: 'GET',
           headers: {
-              'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `${token}`,
           },
         };
 
-        const response = await fetch(apiEndpoint, fetchOptions);
+        const endpoint = apiEndpoint;
+        const response = await fetch(endpoint, fetchOptions);
         const result = await response.json();
         if (result.success) {
           setUsers(result.message);
@@ -28,10 +37,11 @@ const Leaderboard = ({ apiEndpoint, title, recordType }) => {
       } catch (error) {
         setError(error.message);
       }
+      setLoading(false)
     };
 
     fetchLeaderboard();
-  }, [apiEndpoint]);
+  }, [apiEndpoint, rankingType]);
 
   if (error) {
     return (
@@ -44,19 +54,23 @@ const Leaderboard = ({ apiEndpoint, title, recordType }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
+      {loading ?
+      <ActivityIndicator size="large" color="black" style={styles.spinner}/>
+      :
       <ScrollView style={styles.scrollView}>
         {users.map((user, index) => (
           <TouchableOpacity
             key={index}
-            style={styles.leaderBoardItem}
+            style={styles.leaderboardItem}
             onPress={() => navigation.navigate('ProfileScreen', { userId: user.id })}
           >
             <Text style={styles.rank}>TOP{index + 1}</Text>
             <Text style={styles.userName}>{user.userName}</Text>
-            <Text style={styles.record}>{user.stat[recordType]}</Text>
+            <Text style={styles.record}>{user.stat[rankingType]}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
+      }
     </View>
   );
 };
@@ -65,39 +79,67 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f8f8',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
     textAlign: 'center',
+    marginVertical: 10,
+  },
+  toggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  toggleButton: {
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#000',
+  },
+  activeToggleButton: {
+    backgroundColor: '#007AFF',
+  },
+  toggleButtonText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  activeToggleButtonText: {
+    color: '#fff',
   },
   scrollView: {
     flex: 1,
   },
-  leaderBoardItem: {
+  leaderboardItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 5,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   rank: {
-    flex: 1,
-    textAlign: 'left',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   userName: {
-    flex: 2,
-    textAlign: 'center',
+    fontSize: 16,
   },
   record: {
-    flex: 1,
-    textAlign: 'right',
+    fontSize: 16,
+    color: '#007AFF',
   },
   error: {
     fontSize: 16,
     color: 'red',
+    textAlign: 'center',
   },
 });
 
