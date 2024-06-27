@@ -10,16 +10,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { useTabBarState } from '../contexts/TabBarStateContext';
 
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator()
 
 
-const Logo = () => (
-  <Image
-    source={require('../assets/logo.jpg')} 
-    style={{ width: 120, height: 50, resizeMode: 'contain', marginTop: 10 }}
-  />
-);
+// const Logo = () => (
+//   <Image
+//     source={require('../assets/logo.jpg')} 
+//     style={{ width: 120, height: 50, resizeMode: 'contain', marginTop: 10 }}
+//   />
+// );
 
 // const CustomStackNavigator = ({ children }) => (
 //   <View style={styles.container}>
@@ -55,8 +57,34 @@ const HomeScreen = ({navigation}) => {
     const { hideTabBar } = useTabBarState()
 
     return (
-      <Tabs.Navigator>
-          <Tabs.Screen name="Jugar" options={{headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
+      <Tabs.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+
+              if (route.name === 'Jugar') {
+                  iconName = focused
+                      ? 'game-controller'
+                      : 'game-controller-outline';
+              } else if (route.name === 'Leaderboard') {
+                  iconName = focused
+                      ? 'trophy'
+                      : 'trophy-outline';
+              } else if (route.name === 'My Profile') {
+                  iconName = focused
+                      ? 'person'
+                      : 'person-outline';
+              }
+
+              return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: 'tomato',
+          tabBarInactiveTintColor: 'gray',
+          tabBarStyle: hideTabBar ? { display: 'none', height: 0 } : {},
+      })}
+      >
+          <Tabs.Screen name="Jugar" options={{
+            headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
           <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderboardScreen} />
           <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} />
       </Tabs.Navigator>

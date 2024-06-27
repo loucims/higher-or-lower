@@ -8,6 +8,8 @@ import { useSelector } from 'react-redux';
 import { selectAuthToken } from '../store/selectors/auth';
 
 
+
+
 const styles = StyleSheet.create({
     mainContainer: {
         position: 'relative',
