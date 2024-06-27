@@ -1,37 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import UserProfile from '../components/UserProfile';
 import {API_URL} from "@env"
+import { useSelector } from 'react-redux';
+import { selectAuthToken } from '../store/selectors/auth';
+import { ActivityIndicator } from 'react-native';
 
 const ProfileScreen = ({ route, navigation }) => {
+  const token = useSelector(selectAuthToken)
   const { userId } = route.params;
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchProfile = async () => {
       try {
+          const fetchOptions = {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `${token}`,
+              },
+          };
+  
+          const response = await fetch(`${API_URL}/user/profile/${userId}`, fetchOptions);
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const result = await response.json();
 
-        const fetchOptions = {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-        };
-
-        const response = await fetch(`${API_URL}/getUserById/${userId}`, fetchOptions);
-        const result = await response.json();
-        if (result.success) {
-          setUserData(result.message);
-        } else {
-          setError(result.message);
-        }
+          setUserData(result.message)
       } catch (error) {
-        setError(error.message);
+          console.log(error);
       }
-    };
+    }
+    if (!token) return;
 
-    fetchUserProfile();
+    fetchProfile();
   }, [userId]);
 
   const handleBack = () => {
@@ -51,7 +56,7 @@ const ProfileScreen = ({ route, navigation }) => {
         />
       ) : (
         <View style={styles.loadingContainer}>
-          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="black" style={styles.spinner}/>
         </View>
       )}
     </View>

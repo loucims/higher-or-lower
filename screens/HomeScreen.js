@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import { useEffect, useState } from 'react';
 import MyProfileScreen from './MyProfileScreen';
 import LeaderboardScreen from './LeaderboardScreen';
+import ProfileScreen from './ProfileScreen';
 import ChooseCategory from './ChooseCategory';
 import Game from './Game';
 
@@ -13,21 +14,19 @@ import { useTabBarState } from '../contexts/TabBarStateContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const Stack = createNativeStackNavigator();
+const LeaderboardStack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator()
 
 
-// const Logo = () => (
-//   <Image
-//     source={require('../assets/logo.jpg')} 
-//     style={{ width: 120, height: 50, resizeMode: 'contain', marginTop: 10 }}
-//   />
-// );
+function LeaderboardStackNavigator() {
+  return (
+    <LeaderboardStack.Navigator>
+      <LeaderboardStack.Screen name="LeaderboardScreen" options={{headerShown: false}} component={LeaderboardScreen}/>
+      <LeaderboardStack.Screen name="ProfileScreen" options={{headerShown: false}} component={ProfileScreen}/>
+    </LeaderboardStack.Navigator>
+  );
+}
 
-// const CustomStackNavigator = ({ children }) => (
-//   <View style={styles.container}>
-//     {children}
-//   </View>
-// );
 
 
 function GameplayLoop({route, navigation}) {
@@ -85,7 +84,7 @@ const HomeScreen = ({navigation}) => {
       >
           <Tabs.Screen name="Jugar" options={{
             headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
-          <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderboardScreen} />
+          <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderboardStackNavigator} />
           <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} />
       </Tabs.Navigator>
     )

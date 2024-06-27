@@ -29,6 +29,7 @@ const Leaderboard = ({ apiEndpoint, title, rankingType = 'normal' }) => {
         const response = await fetch(endpoint, fetchOptions);
         const result = await response.json();
         if (result.success) {
+          console.log(result.message)
           setUsers(result.message);
         } else {
           setError(result.message);

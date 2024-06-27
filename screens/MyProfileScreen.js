@@ -4,6 +4,7 @@ import UserProfile from '../components/UserProfile';
 import {API_URL} from "@env"
 import { useSelector } from 'react-redux';
 import { selectAuthToken } from '../store/selectors/auth';
+import { ActivityIndicator } from 'react-native';
 
 const MyProfileScreen = () => {
   const token = useSelector(selectAuthToken)
@@ -48,7 +49,7 @@ const MyProfileScreen = () => {
         />
       ) : (
         <View style={styles.loadingContainer}>
-          <Text>Cargando...</Text>
+          <ActivityIndicator size="large" color="black" style={styles.spinner}/>
         </View>
       )}
     </View>
@@ -58,7 +59,6 @@ const MyProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
   },
   loadingContainer: {
