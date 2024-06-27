@@ -1,6 +1,6 @@
 // store/reducers/auth.js
 import { createSlice } from '@reduxjs/toolkit';
-import { login, signup } from '../actions/auth';
+import { authenticate, login, signup } from '../actions/auth';
 
 const initialState = {
     token: null,
@@ -26,6 +26,9 @@ const authSlice = createSlice({
             .addCase(login.rejected, (state, action) => {
                 state.error = action.payload.error;
             })
+            .addCase(authenticate, (state, action) => {
+              state.token = action.payload;
+          })
             .addCase(signup.fulfilled, (state, action) => {
                 state.token = action.payload.message;
                 state.userId = action.payload.userId;

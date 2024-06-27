@@ -1,4 +1,4 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import {API_URL} from '@env'
@@ -33,8 +33,7 @@ export const signup = createAsyncThunk('auth/signup', async ({ email, password }
         await AsyncStorage.setItem(
             'userData',
             JSON.stringify({
-                token: resData.token,
-                userId: resData.userId
+                token: resData.message
             })
         );
 
@@ -73,8 +72,7 @@ export const login = createAsyncThunk('auth/login', async ({ email, password }, 
         await AsyncStorage.setItem(
             'userData',
             JSON.stringify({
-                token: resData.token,
-                userId: resData.userId
+                token: resData.message,
             })
         );
 
@@ -84,7 +82,9 @@ export const login = createAsyncThunk('auth/login', async ({ email, password }, 
     }
 });
 
-
+export const authenticate = createAction('auth/authenticate', (token) => ({
+  payload: token,
+}));
 
 //import { AsyncStorage } from 'react-native';
 

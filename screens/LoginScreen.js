@@ -11,10 +11,11 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useDispatch } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Input from '../components/Input';
 import Card from '../components/Card';
-import { signup, login } from '../store/actions/auth';
+import { signup, login, authenticate } from '../store/actions/auth';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -83,6 +84,21 @@ const LoginScreen = props => {
 
     });
 
+    useEffect(() => {
+        const tryLogin = async () => {
+            const userData = await AsyncStorage.getItem('userData');
+            if (!userData) {
+                return;
+            }
+            const transformedData = JSON.parse(userData);
+            const { token } = transformedData;
+            if (token) {
+                dispatch(authenticate(token));
+                props.navigation.navigate('Home');
+            }
+        };
+        tryLogin();
+    }, [dispatch]);
 
 
     useEffect(() => {

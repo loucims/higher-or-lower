@@ -4,6 +4,7 @@ import {API_URL} from "@env"
 import { useSelector } from 'react-redux';
 import { selectAuthToken } from '../store/selectors/auth';
 import { Image } from 'expo-image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { TouchableOpacity } from 'react-native';
 
@@ -15,6 +16,15 @@ const ChooseCategory = ({ navigation }) => {
 
     const handleModeToggle = () => {
         setIsTimedMode(prevMode => !prevMode);
+    };
+
+    const clearUserData = async () => {
+        try {
+            await AsyncStorage.removeItem('userData');
+            console.warn('User data removed from Async Storage');
+        } catch (err) {
+            console.error('Failed to clear user data', err);
+        }
     };
 
 
@@ -114,6 +124,7 @@ const ChooseCategory = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Image
+                onTouchEnd={() => {clearUserData()}}
                 source={require('../assets/logo.png')} 
                 style={{position: 'absolute', top: 15, left: 0, width: 95, aspectRatio: 1, resizeMode: 'contain', marginTop: 10 }}
             />

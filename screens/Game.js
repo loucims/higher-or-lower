@@ -320,7 +320,7 @@ const Game = ({ navigation, route }) => {
         let count = 0;
         const interval = setInterval(() => {
             if (count < targetValue) {
-                count += Math.ceil(targetValue / 100);
+                count += Math.ceil(targetValue / 10);
                 setSearchCount(count);
             } else {
                 clearInterval(interval);
