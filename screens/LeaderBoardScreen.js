@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Button, StyleSheet } from 'react-native';
-import LeaderBoard from '../components/LeaderBoard';
+import LeaderBoard from '../components/leaderBoard';
 import {API_URL} from "@env"
 
 const LeaderBoardScreen = () => {

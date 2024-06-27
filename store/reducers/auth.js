@@ -1,4 +1,5 @@
 import { AUTHENTICATE, LOGOUT, SET_DID_TRY_AL } from '../actions/auth';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   token: null,
@@ -6,7 +7,25 @@ const initialState = {
   didTryAutoLogin: false
 };
 
-export default (state = initialState, action) => {
+const authSlice = createSlice({
+    name: 'auth',
+    initialState,
+    reducers: {
+        login(state, action) {
+            state.token = action.payload.token;
+            state.userId = action.payload.userId;
+        },
+        signup(state, action) {
+            state.token = action.payload.token;
+            state.userId = action.payload.userId;
+        }
+    }
+});
+
+export const { login, signup } = authSlice.actions;
+export default authSlice.reducer;
+
+/*export default (state = initialState, action) => {
   switch (action.type) {
     case AUTHENTICATE:
       return {
@@ -32,4 +51,4 @@ export default (state = initialState, action) => {
     default:
       return state;
   }
-};
+};*/

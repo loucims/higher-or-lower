@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const LeaderBoard = ({ apiEndpoint, title, recordType }) => {
+const leaderBoard = ({ apiEndpoint, title, recordType }) => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LeaderBoard;
+export default leaderBoard;
