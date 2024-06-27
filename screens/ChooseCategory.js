@@ -1,15 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
 import {API_URL} from "@env"
 import { useSelector } from 'react-redux';
 import { selectAuthToken } from '../store/selectors/auth';
+import { Image } from 'expo-image';
+
+import { TouchableOpacity } from 'react-native';
 
 const ChooseCategory = ({ navigation }) => {
     const [loading, setLoading] = useState(false)
     const token = useSelector(selectAuthToken)
 
+    const [isTimedMode, setIsTimedMode] = useState(false);
+
+    const handleModeToggle = () => {
+        setIsTimedMode(prevMode => !prevMode);
+    };
+
+
     const fetchQuestions = async (genre = 'movie', pageSize = 5, lastKey = '') => {
-        setLoading(true)
         try {
             const fetchOptions = {
                 method: 'GET',
@@ -34,7 +43,6 @@ const ChooseCategory = ({ navigation }) => {
         } catch (error) {
             console.log(error);
         }
-        setLoading(false)
     }
 
     const fetchProfile = async () => {
@@ -62,13 +70,21 @@ const ChooseCategory = ({ navigation }) => {
 
     const handleGenrePress = async (genre) => {
         if (!token) throw new Error('No token found')
-        console.log(token)
+        setLoading(true)
+
+        
         const profile = await fetchProfile()
         const highscore = profile.stat.recordNormal
         const userID = profile.id
-        console.log(highscore)
+
         const result = await fetchQuestions(genre, 5, '')
-        if (!result) return console.log('Error fetching data')
+        if (result.data.length == 0 || !result) {
+            setLoading(false)
+            return console.warn('No questions found')
+
+        } 
+
+        setLoading(false)
         navigation.navigate('Game', {
             genre: genre,
             limit: 10,
@@ -76,19 +92,129 @@ const ChooseCategory = ({ navigation }) => {
             initData: result.data,
             initHighscore: highscore,
             userID: userID,
-            isTimed: true,
+            isTimed: isTimedMode,
         })
     }
 
+    if (loading) return (
+        <View style={styles.screen}>
 
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Juego</Text>
-            <Text>Elegir categoria</Text>
-            <Text onPress={() => handleGenrePress('movie')}>Peliculas</Text>
-            <Text onPress={() => handleGenrePress('movie')}>Videojuegos</Text>
+            <Image
+                source={require('../assets/logo.png')} 
+                style={styles.image}
+                resizeMode="contain" 
+            />
+            <ActivityIndicator size="large" color="black" style={styles.spinner}/>
+            <Text style={styles.text}>Loading...</Text>
         </View>
     )
-}
+
+
+    return (
+        <View style={styles.container}>
+            <Image
+                source={require('../assets/logo.png')} 
+                style={{position: 'absolute', top: 15, left: 0, width: 95, aspectRatio: 1, resizeMode: 'contain', marginTop: 10 }}
+            />
+            <Text style={styles.title}>Jugar</Text>
+            <Text style={styles.subtitle}>Elegir categoría</Text>
+            <View style={styles.toggleContainer}>
+                <TouchableOpacity onPress={handleModeToggle} style={[styles.toggleButton, isTimedMode && styles.activeMode]}>
+                    <Text style={styles.toggleText}>Modo Timeado</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleModeToggle} style={[styles.toggleButton, !isTimedMode && styles.activeMode]}>
+                    <Text style={styles.toggleText}>Normal</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={styles.categoryContainer}>
+                <TouchableOpacity onPress={() => handleGenrePress('movie')} style={[styles.categoryButton]}>
+                    <Text style={styles.categoryText}>Películas</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => handleGenrePress('game')} style={[styles.categoryButton]}>
+                    <Text style={styles.categoryText}>Videojuegos</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20
+    },
+    subtitle: {
+        fontSize: 18,
+        marginBottom: 20
+    },
+    toggleContainer: {
+        flexDirection: 'row',
+        marginBottom: 20
+    },
+    toggleButton: {
+        padding: 10,
+        marginHorizontal: 5,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#000'
+    },
+    activeMode: {
+        backgroundColor: '#ddd'
+    },
+    toggleText: {
+        fontSize: 16
+    },
+    categoryContainer: {
+        width: '100%',
+        alignItems: 'center'
+    },
+    categoryButton: {
+        padding: 10,
+        marginVertical: 5,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#000',
+        width: '80%',
+        alignItems: 'center'
+    },
+    selectedCategory: {
+        backgroundColor: '#ddd'
+    },
+    categoryText: {
+        fontSize: 16
+    },
+
+
+    screen: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff'
+    },
+
+    image: {
+        width: '80%', 
+        height: '40%', 
+        marginBottom: 20 
+      },
+
+    spinner: {
+        marginTop: 20 
+      },
+
+    text: {
+        marginTop: 20,
+        fontSize: 18,
+        color: '#000'
+    }
+});
 
 export default ChooseCategory

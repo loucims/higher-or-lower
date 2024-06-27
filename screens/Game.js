@@ -170,7 +170,7 @@ const Game = ({ navigation, route }) => {
     const bottomOptionAnim = useRef(new Animated.Value(0)).current;
     const optionsOpacity = useRef(new Animated.Value(1)).current;
 
-    const [time, setTime] = useState(10); // 2:30 (2 * 60 + 30)
+    const [time, setTime] = useState(60); // 2:30 (2 * 60 + 30)
     const [isActive, setIsActive] = useState(isTimed ? true : false);
   
     useEffect(() => {
@@ -429,7 +429,7 @@ const Game = ({ navigation, route }) => {
         setScore(0);
         setLost(false);
         if (isTimed) {
-            setTime(10);
+            setTime(60);
             setIsActive(true);
         }
     }
@@ -501,10 +501,13 @@ const Game = ({ navigation, route }) => {
 
                 <Image source={{uri: options[1].image}} resizeMode="cover" style={[styles.imageAbsolute, {zIndex: 0}]} placeholder={options[1].blurhash}/>
             </Animated.View>
+            
+            {isTimed &&
+                <View style={styles.timer}>
+                    <Text style={styles.timerText}>{formatTime(time)}</Text>
+                </View>
+            }
 
-            <View style={styles.timer}>
-                <Text style={styles.timerText}>{formatTime(time)}</Text>
-            </View>
             
             </>
             :

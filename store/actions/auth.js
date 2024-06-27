@@ -9,7 +9,6 @@ export const signup = createAsyncThunk('auth/signup', async ({ email, password }
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                
             },
             body: JSON.stringify(
               {
