@@ -1,34 +1,34 @@
 import React, { useState } from 'react';
 import { View, Button, StyleSheet } from 'react-native';
-import LeaderBoard from '../components/leaderBoard';
+import Leaderboard from '../components/Leaderboard';
 import {API_URL} from "@env"
 
-const LeaderBoardScreen = () => {
-  const [currentLeaderBoard, setCurrentLeaderBoard] = useState('normal');
+const LeaderboardScreen = () => {
+  const [currentLeaderboard, setCurrentLeaderboard] = useState('normal');
 
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
         <Button
-          title="LeaderBoard Normal"
-          onPress={() => setCurrentLeaderBoard('normal')}
-          disabled={currentLeaderBoard === 'normal'}
+          title="Leaderboard Normal"
+          onPress={() => setCurrentLeaderboard('normal')}
+          disabled={currentLeaderboard === 'normal'}
         />
         <Button
-          title="LeaderBoard Timer"
-          onPress={() => setCurrentLeaderBoard('timer')}
-          disabled={currentLeaderBoard === 'timer'}
+          title="Leaderboard Timer"
+          onPress={() => setCurrentLeaderboard('timer')}
+          disabled={currentLeaderboard === 'timer'}
         />
       </View>
-      {currentLeaderBoard === 'normal' ? (
-        <LeaderBoard
-          apiEndpoint={`${API_URL}/getLeaderBoardUsers`}
+      {currentLeaderboard === 'normal' ? (
+        <Leaderboard
+          apiEndpoint={`${API_URL}/getLeaderboardUsers`}
           title="Ranking Modo Normal"
           recordType="recordNormal"
         />
       ) : (
-        <LeaderBoard
-          apiEndpoint={`${API_URL}/getLeaderBoardUsersTimer`}
+        <Leaderboard
+          apiEndpoint={`${API_URL}/getLeaderboardUsersTimer`}
           title="Ranking Modo Timer"
           recordType="recordTimer"
         />
@@ -49,4 +49,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LeaderBoardScreen;
+export default LeaderboardScreen;

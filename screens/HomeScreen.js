@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import MyProfileScreen from './MyProfileScreen';
-import LeaderBoardScreen from './LeaderBoardScreen';
+import LeaderboardScreen from './LeaderboardScreen';
 import ChooseCategory from './ChooseCategory';
 import Game from './Game';
 
@@ -44,7 +44,7 @@ const HomeScreen = ({navigation}) => {
     return (
       <Tabs.Navigator>
           <Tabs.Screen name="Jugar" options={{headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
-          <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderBoardScreen} />
+          <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderboardScreen} />
           <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} />
       </Tabs.Navigator>
     )
