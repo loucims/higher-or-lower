@@ -128,6 +128,12 @@ const styles = StyleSheet.create({
         bottom: 15,
         right: 15,
         zIndex: 1,
+    },
+    timerText: {
+        fontFamily: 'Inter',
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white'
     }
 
 });
@@ -142,7 +148,7 @@ const Game = ({ navigation, route }) => {
     const [optionHeight, setOptionHeight] = useState(0);
 
     const [loading, setLoading] = useState(false)
-    const { genre, limit, startAfterKey, initData, initHighscore, userID } = route.params;
+    const { genre, limit, startAfterKey, initData, initHighscore, userID, isTimed } = route.params;
     const [firstOption, secondOption, ...restOptions] = initData || [];
 
     const [lastKey, setLastKey] = useState(startAfterKey);
@@ -164,25 +170,27 @@ const Game = ({ navigation, route }) => {
     const bottomOptionAnim = useRef(new Animated.Value(0)).current;
     const optionsOpacity = useRef(new Animated.Value(1)).current;
 
-    const [time, setTime] = useState(150); // 2:30 in seconds (2 * 60 + 30)
-    const [isActive, setIsActive] = useState(true);
+    const [time, setTime] = useState(10); // 2:30 (2 * 60 + 30)
+    const [isActive, setIsActive] = useState(isTimed ? true : false);
   
     useEffect(() => {
-      let interval = null;
-      if (isActive && time > 0) {
-        interval = setInterval(() => {
-          setTime((time) => time - 1);
-        }, 1000);
-      } else if (time === 0) {
-        clearInterval(interval);
-        onTimerEnd();
-      }
-      return () => clearInterval(interval);
+        if (isTimed) {
+            let interval = null;
+            if (isActive && time > 0) {
+                interval = setInterval(() => {
+                setTime((time) => time - 1);
+                }, 1000);
+            } else if (time === 0) {
+                clearInterval(interval);
+                onTimerEnd();
+            }
+            return () => clearInterval(interval);
+        }
     }, [isActive, time]);
   
     const onTimerEnd = () => {
-      console.log('Timer ended!');
-      // Do something when the timer ends
+        if (lost) return
+        handleLoss()
     };
 
     const formatTime = (time) => {
@@ -420,6 +428,10 @@ const Game = ({ navigation, route }) => {
         setTotalGuesses(0);
         setScore(0);
         setLost(false);
+        if (isTimed) {
+            setTime(10);
+            setIsActive(true);
+        }
     }
 
     return (
@@ -491,7 +503,7 @@ const Game = ({ navigation, route }) => {
             </Animated.View>
 
             <View style={styles.timer}>
-                <Text>{formatTime(time)}</Text>
+                <Text style={styles.timerText}>{formatTime(time)}</Text>
             </View>
             
             </>

@@ -75,7 +75,8 @@ const ChooseCategory = ({ navigation }) => {
             startAfterKey: result.lastKey,
             initData: result.data,
             initHighscore: highscore,
-            userID: userID
+            userID: userID,
+            isTimed: true,
         })
     }
 

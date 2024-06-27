@@ -21,11 +21,11 @@ const Logo = () => (
   />
 );
 
-const CustomStackNavigator = ({ children }) => (
-  <View style={styles.container}>
-    {children}
-  </View>
-);
+// const CustomStackNavigator = ({ children }) => (
+//   <View style={styles.container}>
+//     {children}
+//   </View>
+// );
 
 
 function GameplayLoop({route, navigation}) {
@@ -43,13 +43,10 @@ function GameplayLoop({route, navigation}) {
 
 
   return (
-
-    <CustomStackNavigator>
     <Stack.Navigator>
       <Stack.Screen name="Category" options={{headerShown: false, presentation: "modal"}} component={ChooseCategory}/>
       <Stack.Screen name="Game" options={{headerShown: false, animation: 'slide_from_bottom', gestureEnabled: false}} component={Game}/>
     </Stack.Navigator>
-    </CustomStackNavigator>
   );
 }
 
@@ -58,14 +55,11 @@ const HomeScreen = ({navigation}) => {
     const { hideTabBar } = useTabBarState()
 
     return (
-      <View style={styles.container}>
-      <Logo />
       <Tabs.Navigator>
           <Tabs.Screen name="Jugar" options={{headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
           <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderboardScreen} />
           <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} />
       </Tabs.Navigator>
-      </View>
     )
 }
 
