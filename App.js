@@ -35,6 +35,7 @@ const App = () => {
     <Provider store={context}>
       <NavigationContainer>
         <Stack.Navigator>
+          <Stack.Screen name="Loading" options={{ headerShown: false }} component={LoadingScreen} />
           <Stack.Screen name="Login" options={{headerShown: false}} component={LoginScreen} />
           <Stack.Screen name="Home" options={{headerShown: false, gestureEnabled: false}} component={HomeScreen} />
         </Stack.Navigator>

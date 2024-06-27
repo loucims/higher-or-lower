@@ -5,13 +5,19 @@ import {API_URL} from '@env'
 
 export const signup = createAsyncThunk('auth/signup', async ({ email, password }, thunkAPI) => {
     try {
-        const response = await fetch(`${API_URL}/user/signup`, {
+        const response = await fetch(`${API_URL}/user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Cookie': "token=ey28232w7u32u7hdsuhsdhuh2h7272273"
+                
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify(
+              {
+                "userName": email,
+                "mail": email,
+                "password": password
+              }
+            ),
             
         });
 
