@@ -1,71 +1,80 @@
-// store/actions/auth.js
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
-const API_URL = 'https://keen-man-hot.ngrok-free.app'; // Replace with the actual URL of your backend
+const API_URL = Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080';// Replace with the actual URL of your backend
 
 export const signup = createAsyncThunk('auth/signup', async ({ email, password }, thunkAPI) => {
-    const response = await fetch(`${API_URL}/signup`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-    });
+    try {
+        const response = await fetch(`${API_URL}/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': "token=ey28232w7u32u7hdsuhsdhuh2h7272273"
+            },
+            body: JSON.stringify({ email, password }),
+            
+        });
 
-    if (!response.ok) {
-        const errorResData = await response.json();
-        let message = 'Something went wrong!';
-        if (errorResData.error.message === 'EMAIL_EXISTS') {
-            message = 'This email exists already!';
+        if (!response.ok) {
+            const errorResData = await response.json();
+            let message = 'Something went wrong!';
+            if (errorResData.message.includes('El email no puede ya existir')) {
+                message = 'This email already exists!';
+            }
+            throw new Error(message);
         }
-        throw new Error(message);
+
+        const resData = await response.json();
+        await AsyncStorage.setItem(
+            'userData',
+            JSON.stringify({
+                token: resData.token,
+                userId: resData.userId
+            })
+        );
+
+        return resData;
+    } catch (error) {
+        return thunkAPI.rejectWithValue({ error: error.message });
     }
-
-    const resData = await response.json();
-    await AsyncStorage.setItem(
-        'userData',
-        JSON.stringify({
-            token: resData.token,
-            userId: resData.userId
-        })
-    );
-
-    return resData;
 });
 
 export const login = createAsyncThunk('auth/login', async ({ email, password }, thunkAPI) => {
-    const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-    });
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cookie': "token=ey28232w7u32u7hdsuhsdhuh2h7272273"
+            },
+            body: JSON.stringify({ email, password }),
+            
+        });
 
-    if (!response.ok) {
-        const errorResData = await response.json();
-        let message = 'Something went wrong!';
-        if (errorResData.error.message === 'EMAIL_NOT_FOUND') {
-            message = 'This email could not be found!';
-        } else if (errorResData.error.message === 'INVALID_PASSWORD') {
-            message = 'This password is not valid!';
+        if (!response.ok) {
+            const errorResData = await response.json();
+            let message = 'Something went wrong!';
+            if (errorResData.message.includes('Datos incorrectos')) {
+                message = 'Invalid email or password!';
+            }
+            throw new Error(message);
         }
-        throw new Error(message);
+
+        const resData = await response.json();
+        await AsyncStorage.setItem(
+            'userData',
+            JSON.stringify({
+                token: resData.token,
+                userId: resData.userId
+            })
+        );
+
+        return resData;
+    } catch (error) {
+        return thunkAPI.rejectWithValue({ error: error.message });
     }
-
-    const resData = await response.json();
-    await AsyncStorage.setItem(
-        'userData',
-        JSON.stringify({
-            token: resData.token,
-            userId: resData.userId
-        })
-    );
-
-    return resData;
 });
-
 
 
 

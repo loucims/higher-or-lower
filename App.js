@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { enableScreens } from 'react-native-screens';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
+import LoadingScreen from './screens/LoadingScreen';
 import { Provider } from 'react-redux';
 import TabBarStateProvider from './contexts/TabBarStateContext';
 import context from './contexts/context';
