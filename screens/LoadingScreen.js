@@ -3,15 +3,15 @@ import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Image } from 'react-native';
 import { useEffect } from 'react';
 
-const LoadingScreen = ({ navigation }) => {
+const LoadingScreen = ({ setLoading }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login');
+      setLoading(false);
     }, 4000);
 
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [setLoading]);
 
     return (
         <View style={styles.screen}>

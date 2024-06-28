@@ -42,30 +42,8 @@ const formReducer = (state, action) => {
     return state;
 };
 
-/*const formReducer = (state, action) => {
-    if (action.type === FORM_INPUT_UPDATE) {
-        const updatedValues = {
-            ...state.inputValues,
-            [action.input]: action.value
-        };
-        const updatedValidities = {
-            ...state.inputValidities,
-            [action.input]: action.isValid
-        };
-        let updatedFormIsValid = true;
-        for (const key in updatedValidities) {
-            updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
-        }
-        return {
-            formIsValid: updatedFormIsValid,
-            inputValidities: updatedValidities,
-            inputValues: updatedValues
-        };
-    }
-    return state;
-};*/
 
-const LoginScreen = props => {
+const LoginScreen = ({setIsLoggedIn}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const [isSignup, setIsSignup] = useState(false);
@@ -94,7 +72,7 @@ const LoginScreen = props => {
             const { token } = transformedData;
             if (token) {
                 dispatch(authenticate(token));
-                props.navigation.navigate('Home');
+                setIsLoggedIn(true)
             }
         };
         tryLogin();
@@ -132,7 +110,7 @@ const LoginScreen = props => {
             console.log('Login/Signup successful', resultAction);
             if (resultAction) {
                 console.log('Navigating to LoadingScreen');
-                props.navigation.navigate('Home');
+                setIsLoggedIn(true);
             }
         } catch (err) {
             console.error('Error during login/signup', err);
@@ -140,32 +118,6 @@ const LoginScreen = props => {
             setIsLoading(false);
         }
     };
-
-    /*const authHandler = async () => {
-        let action;
-        if (isSignup) {
-            action = authActions.signup(
-                formState.inputValues.email,
-                formState.inputValues.password
-            );
-            
-        } else {
-            action = authActions.login(
-                formState.inputValues.email,
-                formState.inputValues.password
-            );
-           
-        }
-        setError(null);
-        setIsLoading(true);
-        try {
-            await dispatch(action);
-            props.navigation.navigate('Home');
-        } catch (err) {
-            setError(err.message);
-            setIsLoading(false);
-        }
-    };*/
 
 
     const inputChangeHandler = useCallback(

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Make sure you have expo-linear-gradient installed
 
-const UserProfile = ({ userName, recordNormal, recordTimer, totalGuesses, showBackButton, onBack }) => {
+const UserProfile = ({ userName, recordNormal, recordTimer, totalGuesses, showBackButton, onBack, showLogoutButton = false, onLogout }) => {
   return (
     <LinearGradient
       colors={['#ff7e5f', '#feb47b']}
@@ -13,6 +13,12 @@ const UserProfile = ({ userName, recordNormal, recordTimer, totalGuesses, showBa
           <Text style={styles.backButtonText}>Ir atras</Text>
         </TouchableOpacity>
       )}
+      {showLogoutButton && (
+        <TouchableOpacity onPress={onLogout} style={styles.backButton}>
+          <Text style={styles.backButtonText}>Log out</Text>
+        </TouchableOpacity>
+      )}
+
       <Text style={styles.title}>Perfil</Text>
       <Text style={styles.userName}>{userName}</Text>
       <View style={styles.statsContainer}>

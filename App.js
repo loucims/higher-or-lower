@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 import TabBarStateProvider from './contexts/TabBarStateContext';
 import context from './contexts/context';
 import { useFonts } from 'expo-font';
+import { useState } from 'react';
 
 
 const Stack = createNativeStackNavigator();
@@ -19,6 +20,8 @@ const App = () => {
   const [fontsLoaded, fontError] = useFonts({
     'Inter': require('./assets/fonts/Inter-VariableFont.ttf'),
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (Platform.OS === "ios") {
@@ -34,11 +37,14 @@ const App = () => {
     <TabBarStateProvider>
     <Provider store={context}>
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Loading" options={{ headerShown: false }} component={LoadingScreen} />
-          <Stack.Screen name="Login" options={{headerShown: false}} component={LoginScreen} />
-          <Stack.Screen name="Home" options={{headerShown: false, gestureEnabled: false}} component={HomeScreen} />
-        </Stack.Navigator>
+      {loading ?
+      <LoadingScreen setLoading={setLoading}/>
+      :
+        isLoggedIn ? 
+        <HomeScreen setIsLoggedIn={setIsLoggedIn} />
+        :
+        <LoginScreen setIsLoggedIn={setIsLoggedIn}/>
+      }
       </NavigationContainer>
     </Provider>
     </TabBarStateProvider>
@@ -48,3 +54,8 @@ const App = () => {
 
 export default App
 
+        {/* <Stack.Navigator>
+          <Stack.Screen name="Loading" options={{ headerShown: false }} component={LoadingScreen} />
+          <Stack.Screen name="Login" options={{headerShown: false}} component={LoginScreen} />
+          <Stack.Screen name="Home" options={{headerShown: false, gestureEnabled: false}} component={HomeScreen} />
+        </Stack.Navigator> */}

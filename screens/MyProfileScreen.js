@@ -6,8 +6,10 @@ import { useSelector } from 'react-redux';
 import { selectAuthToken } from '../store/selectors/auth';
 import { ActivityIndicator } from 'react-native';
 
-const MyProfileScreen = () => {
+
+const MyProfileScreen = ({route}) => {
   const token = useSelector(selectAuthToken)
+  const { handleLogout } = route.params;
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
 
@@ -46,6 +48,8 @@ const MyProfileScreen = () => {
           recordNormal={userData.stat.recordNormal}
           recordTimer={userData.stat.recordTimer}
           totalGuesses={userData.stat.totalGuesses}
+          showLogoutButton={true}
+          onLogout={handleLogout}
         />
       ) : (
         <View style={styles.loadingContainer}>

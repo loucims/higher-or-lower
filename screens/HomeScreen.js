@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyProfileScreen from './MyProfileScreen';
 import LeaderboardScreen from './LeaderboardScreen';
 import ProfileScreen from './ProfileScreen';
@@ -52,8 +53,22 @@ function GameplayLoop({route, navigation}) {
 }
 
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({setIsLoggedIn}) => {
     const { hideTabBar } = useTabBarState()
+
+    const clearUserData = async () => {
+      try {
+          await AsyncStorage.removeItem('userData');
+      } catch (err) {
+          console.error('Failed to clear user data', err);
+      }
+    };
+
+    const handleLogout = async () => {
+        await clearUserData()
+        setIsLoggedIn(false)
+    }
+
 
     return (
       <Tabs.Navigator
@@ -85,7 +100,7 @@ const HomeScreen = ({navigation}) => {
           <Tabs.Screen name="Jugar" options={{
             headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
           <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderboardStackNavigator} />
-          <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} />
+          <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} initialParams={{handleLogout}} />
       </Tabs.Navigator>
     )
 }
