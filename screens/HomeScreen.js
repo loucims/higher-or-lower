@@ -53,22 +53,8 @@ function GameplayLoop({route, navigation}) {
 }
 
 
-const HomeScreen = ({setIsLoggedIn}) => {
+const HomeScreen = () => {
     const { hideTabBar } = useTabBarState()
-
-    const clearUserData = async () => {
-      try {
-          await AsyncStorage.removeItem('userData');
-      } catch (err) {
-          console.error('Failed to clear user data', err);
-      }
-    };
-
-    const handleLogout = async () => {
-        await clearUserData()
-        setIsLoggedIn(false)
-    }
-
 
     return (
       <Tabs.Navigator
@@ -100,7 +86,7 @@ const HomeScreen = ({setIsLoggedIn}) => {
           <Tabs.Screen name="Jugar" options={{
             headerShown: false, tabBarStyle: hideTabBar && {display: 'none', height: 0}}} component={GameplayLoop}/>
           <Tabs.Screen name="Leaderboard" options={{headerShown: false}} component={LeaderboardStackNavigator} />
-          <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen} initialParams={{handleLogout}} />
+          <Tabs.Screen name="My Profile" options={{headerShown: false}} component={MyProfileScreen}/>
       </Tabs.Navigator>
     )
 }

@@ -5,7 +5,8 @@ import { authenticate, login, signup } from '../actions/auth';
 const initialState = {
     token: null,
     userId: null,
-    error: null
+    error: null,
+    isLoggedIn: false
 };
 
 const authSlice = createSlice({
@@ -14,11 +15,20 @@ const authSlice = createSlice({
     reducers: {
         clearError(state) {
             state.error = null;
+        },
+        logIn(state) {
+          state.isLoggedIn = true;
+        },
+        logOff(state) { 
+          state.isLoggedIn = false;
+          state.token = null;
+          state.userId = null;
         }
     },
     extraReducers: (builder) => {
         builder
             .addCase(login.fulfilled, (state, action) => {
+                console.log(action.payload.message)
                 state.token = action.payload.message;
                 state.userId = null;
                 state.error = null;
@@ -41,7 +51,7 @@ const authSlice = createSlice({
     }
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, logIn, logOff } = authSlice.actions;
 export default authSlice.reducer;
 
 

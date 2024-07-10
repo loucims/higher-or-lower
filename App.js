@@ -12,15 +12,12 @@ import context from './contexts/context';
 import { useFonts } from 'expo-font';
 import { useState } from 'react';
 
+import { useSelector } from 'react-redux';
+import { selectIsLoggedIn } from './store/selectors/auth';
 
-const Stack = createNativeStackNavigator();
+const MainApp = () => {
+  const isLoggedIn = useSelector(selectIsLoggedIn);
 
-const App = () => {
-
-  const [fontsLoaded, fontError] = useFonts({
-    'Inter': require('./assets/fonts/Inter-VariableFont.ttf'),
-  });
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,24 +26,38 @@ const App = () => {
     }
   }, []);
 
+  return (
+    <>
+      {loading ?
+      <LoadingScreen setLoading={setLoading}/>
+      :
+        isLoggedIn ? 
+        <HomeScreen />
+        :
+        <LoginScreen />
+      }
+    </>
+  );
+}
+
+
+const App = () => {
+
+  const [fontsLoaded, fontError] = useFonts({
+    'Inter': require('./assets/fonts/Inter-VariableFont.ttf'),
+  });
+
   if (!fontsLoaded && !fontError) {
     return null;
   }
 
   return (
     <TabBarStateProvider>
-    <Provider store={context}>
-      <NavigationContainer>
-      {loading ?
-      <LoadingScreen setLoading={setLoading}/>
-      :
-        isLoggedIn ? 
-        <HomeScreen setIsLoggedIn={setIsLoggedIn} />
-        :
-        <LoginScreen setIsLoggedIn={setIsLoggedIn}/>
-      }
-      </NavigationContainer>
-    </Provider>
+      <Provider store={context}>
+        <NavigationContainer>
+          <MainApp/>
+        </NavigationContainer>
+      </Provider>
     </TabBarStateProvider>
 
   );

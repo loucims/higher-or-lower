@@ -11,11 +11,14 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useDispatch } from 'react-redux';
+import { logIn } from '../store/reducers/auth';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Input from '../components/Input';
 import Card from '../components/Card';
 import { signup, login, authenticate } from '../store/actions/auth';
+
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -43,7 +46,7 @@ const formReducer = (state, action) => {
 };
 
 
-const LoginScreen = ({setIsLoggedIn}) => {
+const LoginScreen = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const [isSignup, setIsSignup] = useState(false);
@@ -59,7 +62,6 @@ const LoginScreen = ({setIsLoggedIn}) => {
             password: false
         },
         formIsValid: false
-
     });
 
     useEffect(() => {
@@ -72,7 +74,7 @@ const LoginScreen = ({setIsLoggedIn}) => {
             const { token } = transformedData;
             if (token) {
                 dispatch(authenticate(token));
-                setIsLoggedIn(true)
+                dispatch(logIn());
             }
         };
         tryLogin();
@@ -110,7 +112,7 @@ const LoginScreen = ({setIsLoggedIn}) => {
             console.log('Login/Signup successful', resultAction);
             if (resultAction) {
                 console.log('Navigating to LoadingScreen');
-                setIsLoggedIn(true);
+                dispatch(logIn());
             }
         } catch (err) {
             console.error('Error during login/signup', err);

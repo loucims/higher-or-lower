@@ -1,17 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import UserProfile from '../components/UserProfile';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_URL} from "@env"
 import { useSelector } from 'react-redux';
 import { selectAuthToken } from '../store/selectors/auth';
+import { useDispatch } from 'react-redux';
+import { logOff } from '../store/reducers/auth';
 import { ActivityIndicator } from 'react-native';
 
 
 const MyProfileScreen = ({route}) => {
+  const dispatch = useDispatch()
   const token = useSelector(selectAuthToken)
-  const { handleLogout } = route.params;
+
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
+
+
+  const handleLogout = async () => {
+    const clearUserData = async () => {
+      try {
+          await AsyncStorage.removeItem('userData');
+      } catch (err) {
+          console.error('Failed to clear user data', err);
+      }
+    };
+    await clearUserData()
+    dispatch(logOff())
+  }
 
   useEffect(() => {
     const fetchProfile = async () => {
